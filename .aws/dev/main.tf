@@ -3,7 +3,7 @@ terraform {
   cloud {
       organization = "RyanAPLearning"
       workspaces {
-          name = "StaticSiteExample"
+          name = "PersonalSite"
       }
   }
 
