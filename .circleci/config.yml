@@ -1,0 +1,177 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+
+#Previous Commands
+#  terraform plan -out tfapply -var-file terraform.tfvars
+#  terraform apply -auto-approve tfapply
+#  terraform plan -destroy -out tfdestroy -var-file terraform.tfvars
+#  terraform apply -auto-approve tfdestroy
+version: 2.1
+
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+jobs:
+  say-hello:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    docker:
+      - image: cimg/base:stable
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
+
+  checkout-workspace:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+
+  plan-apply:
+    working_directory: /tmp/project
+    docker: 
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - checkout
+      - run:
+          name: terraform init & plan
+          command: |
+            ls
+            pwd
+            cd ./.aws/dev
+            ls
+            pwd
+            echo "Trying terraform init"
+            terraform init -upgrade -input=false
+            echo "terraform init successful"
+            echo "Trying terraform plan"
+            terraform plan -var-file terraform.tfvars
+            echo "terraform plan successful"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  
+  apply:
+    docker:
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform apply
+          command: |
+            ls
+            pwd
+            cd ./.aws/dev
+            ls
+            pwd
+            terraform apply -auto-approve
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  plan-destroy:
+    working_directory: /tmp/project
+    docker:
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - checkout
+      - run:
+          name: terraform create destroy plan
+          command: |
+            ls
+            pwd
+            cd ./.aws/dev
+            ls
+            pwd
+            echo "Trying terraform init"
+            terraform init -upgrade -input=false
+            echo "terraform init successful"
+            echo "Trying terraform plan"
+            terraform plan -destroy -var-file terraform.tfvars
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  destroy:
+    docker:
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform destroy
+          command: |
+            ls
+            pwd
+            cd ./.aws/dev
+            ls
+            pwd
+            terraform destroy -auto-approve
+
+
+
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  #say-hello-workflow:
+  #  jobs:
+  #    - say-hello
+
+  plan_approve_apply:
+    jobs:
+      - plan-apply:
+          filters:
+            branches:
+              only: main
+      - hold-apply:
+          type: approval
+          requires:
+            - plan-apply
+          filters:
+            branches:
+              only: main
+      - apply:
+          requires:
+            - hold-apply
+          filters:
+            branches:
+              only: main
+
+  plan_approve_destroy_all:
+    jobs:
+      - plan-destroy:
+          filters:
+            branches:
+              only: destroy-all
+      - hold-destroy:
+          type: approval
+          requires:
+            - plan-destroy
+          filters:
+            branches:
+              only: destroy-all
+      - destroy:
+          requires:
+            - hold-destroy
+          filters:
+            branches:
+              only: destroy-all
