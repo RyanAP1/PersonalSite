@@ -127,7 +127,32 @@ jobs:
             pwd
             terraform destroy -auto-approve
 
-
+  #TO-DO Make new executor in ECR with AWSCLI installed for this deploy step
+  deploy-site-to-dev:
+    working_directory: /tmp/project
+    docker: 
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:awscli-2.8.6
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - checkout
+      - run:
+          name: terraform init & plan
+          command: |
+            ls
+            pwd
+            cd site
+            ls
+            pwd
+            aws configure set default.region us-east-1
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws s3 sync . s3://ryanaparedes-dev.com
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -155,7 +180,13 @@ workflows:
           filters:
             branches:
               only: main
-
+      - deploy-site-to-dev:
+          requires:
+            - apply
+          filters:
+            branches:
+              only: main
+            
   plan_approve_destroy_all:
     jobs:
       - plan-destroy:
