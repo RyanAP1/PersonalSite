@@ -138,7 +138,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: terraform init & plan
+          name: AWS CLI to deploy site
           command: |
             ls
             pwd
