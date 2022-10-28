@@ -196,13 +196,13 @@ workflows:
       - hold-destroy-dev:
           type: approval
           requires:
-            - plan-destroy
+            - plan-destroy-dev
           filters:
             branches:
               only: destroy-dev
       - destroy-dev:
           requires:
-            - hold-destroy
+            - hold-destroy-dev
           filters:
             branches:
               only: destroy-dev
