@@ -30,7 +30,7 @@ jobs:
     steps:
       - checkout
 
-  plan-apply:
+  plan-apply-dev:
     working_directory: /tmp/project
     docker: 
       - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
@@ -40,7 +40,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: terraform init & plan
+          name: terraform init & plan - dev
           command: |
             ls
             pwd
@@ -58,7 +58,7 @@ jobs:
           paths:
             - .
   
-  apply:
+  apply-dev:
     docker:
       - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
         aws_auth:
@@ -68,7 +68,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: terraform apply
+          name: terraform apply - dev
           command: |
             ls
             pwd
@@ -81,7 +81,7 @@ jobs:
           paths:
             - .
 
-  plan-destroy:
+  plan-destroy-dev:
     working_directory: /tmp/project
     docker:
       - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
@@ -91,7 +91,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: terraform create destroy plan
+          name: terraform create destroy plan - dev
           command: |
             ls
             pwd
@@ -108,7 +108,7 @@ jobs:
           paths:
             - .
 
-  destroy:
+  destroy-dev:
     docker:
       - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
         aws_auth:
@@ -118,7 +118,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: terraform destroy
+          name: terraform destroy - dev
           command: |
             ls
             pwd
@@ -138,7 +138,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: AWS CLI to deploy site
+          name: AWS CLI to deploy site - dev
           command: |
             ls
             pwd
@@ -161,48 +161,56 @@ workflows:
   #  jobs:
   #    - say-hello
 
-  plan_approve_apply:
+  plan_approve_apply_dev:
     jobs:
-      - plan-apply:
+      - plan-apply-dev:
           filters:
             branches:
-              only: main
-      - hold-apply:
+              only: InfraDeployDev
+      - hold-apply-dev:
           type: approval
           requires:
-            - plan-apply
+            - plan-apply-dev
           filters:
             branches:
-              only: main
-      - apply:
+              only: InfraDeployDev
+      - apply-dev:
           requires:
-            - hold-apply
+            - hold-apply-dev
           filters:
             branches:
-              only: main
+              only: InfraDeployDev
       - deploy-site-to-dev:
           requires:
-            - apply
+            - apply-dev
+          filters:
+            branches:
+              only: InfraDeployDev
+            
+  plan_approve_destroy_dev:
+    jobs:
+      - plan-destroy-dev:
+          filters:
+            branches:
+              only: destroy-dev
+      - hold-destroy-dev:
+          type: approval
+          requires:
+            - plan-destroy-dev
+          filters:
+            branches:
+              only: destroy-dev
+      - destroy-dev:
+          requires:
+            - hold-destroy-dev
+          filters:
+            branches:
+              only: destroy-dev
+
+  site_deployment:
+    jobs:
+      - deploy-site-to-dev:
           filters:
             branches:
               only: main
-            
-  plan_approve_destroy_all:
-    jobs:
-      - plan-destroy:
-          filters:
-            branches:
-              only: destroy-all
-      - hold-destroy:
-          type: approval
-          requires:
-            - plan-destroy
-          filters:
-            branches:
-              only: destroy-all
-      - destroy:
-          requires:
-            - hold-destroy
-          filters:
-            branches:
-              only: destroy-all
+      #Next Step. Add Hold and then Deployment to Prod Site
