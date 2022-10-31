@@ -127,7 +127,104 @@ jobs:
             pwd
             terraform destroy -auto-approve
 
-  #TO-DO Make new executor in ECR with AWSCLI installed for this deploy step
+  plan-apply-prod:
+    working_directory: /tmp/project
+    docker: 
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - checkout
+      - run:
+          name: terraform init & plan - prod
+          command: |
+            ls
+            pwd
+            cd ./.aws/prod
+            ls
+            pwd
+            echo "Trying terraform init"
+            terraform init -upgrade -input=false
+            echo "terraform init successful"
+            echo "Trying terraform plan"
+            terraform plan -var-file terraform.tfvars
+            echo "terraform plan successful"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  
+  apply-prod:
+    docker:
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform apply - prod
+          command: |
+            ls
+            pwd
+            cd ./.aws/prod
+            ls
+            pwd
+            terraform apply -auto-approve
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  plan-destroy-prod:
+    working_directory: /tmp/project
+    docker:
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - checkout
+      - run:
+          name: terraform create destroy plan - prod
+          command: |
+            ls
+            pwd
+            cd ./.aws/prod
+            ls
+            pwd
+            echo "Trying terraform init"
+            terraform init -upgrade -input=false
+            echo "terraform init successful"
+            echo "Trying terraform plan"
+            terraform plan -destroy -var-file terraform.tfvars
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  destroy-prod:
+    docker:
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:1.3.2
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform destroy - prod
+          command: |
+            ls
+            pwd
+            cd ./.aws/prod
+            ls
+            pwd
+            terraform destroy -auto-approve
+
+
   deploy-site-to-dev:
     working_directory: /tmp/project
     docker: 
@@ -149,6 +246,32 @@ jobs:
             aws configure set aws_access_key_id $AWS_ACCESS_KEY
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws s3 sync . s3://ryanaparedes-dev.com
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  deploy-site-to-prod:
+    working_directory: /tmp/project
+    docker: 
+      - image: 472821558027.dkr.ecr.us-east-1.amazonaws.com/ryan-container-repo:awscli-2.8.6
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - checkout
+      - run:
+          name: AWS CLI to deploy site - prod
+          command: |
+            ls
+            pwd
+            cd site
+            ls
+            pwd
+            aws configure set default.region us-east-1
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws s3 sync . s3://ryanaparedes.com
       - persist_to_workspace:
           root: .
           paths:
@@ -207,10 +330,68 @@ workflows:
             branches:
               only: destroy-dev
 
+  plan_approve_apply_prod:
+    jobs:
+      - plan-apply-prod:
+          filters:
+            branches:
+              only: InfraDeployProd
+      - hold-apply-prod:
+          type: approval
+          requires:
+            - plan-apply-prod
+          filters:
+            branches:
+              only: InfraDeployProd
+      - apply-prod:
+          requires:
+            - hold-apply-prod
+          filters:
+            branches:
+              only: InfraDeployProd
+      - deploy-site-to-prod:
+          requires:
+            - apply-prod
+          filters:
+            branches:
+              only: InfraDeployProd
+            
+  plan_approve_destroy_prod:
+    jobs:
+      - plan-destroy-prod:
+          filters:
+            branches:
+              only: destroy-prod
+      - hold-destroy-prod:
+          type: approval
+          requires:
+            - plan-destroy-prod
+          filters:
+            branches:
+              only: destroy-prod
+      - destroy-prod:
+          requires:
+            - hold-destroy-prod
+          filters:
+            branches:
+              only: destroy-prod
+
   site_deployment:
     jobs:
       - deploy-site-to-dev:
           filters:
             branches:
               only: main
+      - hold-deploy-prod:
+          type: approval
+          requires:
+            - deploy-site-to-dev
+            filters:
+              branches:
+                only: main
+      - deploy-site-to-prod:
+          filters:
+            branches:
+              only: main
+
       #Next Step. Add Hold and then Deployment to Prod Site
