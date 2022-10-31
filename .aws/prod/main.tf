@@ -59,15 +59,16 @@ data "aws_iam_policy_document" "website_policy" {
       "s3:GetObject"
     ]
     principals {
-      identifiers = [aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn]
+      identifiers = [
+      aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn]
       type = "AWS"
     }
-    resources = ["arn:aws:s3:::${aws_s3_bucket.www.bucket}/*"]
+    resources = ["arn:aws:s3:::${var.site_name_prod}/*"]
   }
 
   statement {
     actions = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::${aws_s3_bucket.www.bucket}"]
+    resources = ["arn:aws:s3:::${var.site_name_prod}"]
     principals {
       type = "AWS"
       identifiers = [aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn]
@@ -88,12 +89,12 @@ resource "aws_route53_record" "a-record" {
   type = "A"
   alias {
     name = "${aws_cloudfront_distribution.prod_distribution.domain_name}"
-    zone_id = "${aws_cloudfront_distribution.prod_distribution/hosted_zone_id}"
+    zone_id = "${aws_cloudfront_distribution.prod_distribution.hosted_zone_id}"
     evaluate_target_health = false
   }
 }
 
-# For AWS, we can do DNS validation through Route 53 for ACM
+# For AWS, we can do DNS validation through Route 53 for ACM OLD TRYING TO MAKE WORK
 resource "aws_route53_record" "cert_validation" {
   count = length(aws_acm_certificate.cert.domain_validation_options)
   name = element(aws_acm_certificate.cert.domain_validation_options.*.resource_record_name, count.index)
@@ -102,6 +103,7 @@ resource "aws_route53_record" "cert_validation" {
   records = [element(aws_acm_certificate.cert.domain_validation_options.*.resource_record_value, count.index)]
   ttl = 60
 }
+
 
 
 # ACM Certificate Section
@@ -116,7 +118,7 @@ resource "aws_acm_certificate" "cert" {
 
 resource "aws_acm_certificate_validation" "cert" {
   certificate_arn = "${aws_acm_certificate.cert.arn}"
-  validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
+  validation_record_fqdns = [aws_route53_record.cert_validation[0].fqdn]
 }
 
 # Cloudfront CDN Section
