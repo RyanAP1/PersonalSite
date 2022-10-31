@@ -390,6 +390,8 @@ workflows:
             branches:
               only: main
       - deploy-site-to-prod:
+          requires:
+            - hold-deploy-prod
           filters:
             branches:
               only: main
