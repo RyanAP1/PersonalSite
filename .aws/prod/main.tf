@@ -133,7 +133,7 @@ resource "aws_cloudfront_distribution" "prod_distribution" {
   }
 
   #index.html as root object
-  default_root_object "index.html"
+  default_root_object = "index.html"
   enabled = true
   is_ipv6_enabled = true
   aliases = [var.site_name_prod]
