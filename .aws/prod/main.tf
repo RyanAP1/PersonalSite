@@ -132,11 +132,11 @@ resource "aws_cloudfront_distribution" "prod_distribution" {
     }
   }
 
-  #index.html as root object - CHANGED SOMETHING HERE IF BROKEN
+  #index.html as root object
   default_root_object "index.html"
   enabled = true
   is_ipv6_enabled = true
-  aliases = "${var.site_name_prod}"
+  aliases = [var.site_name_prod]
 
   #For 404, return 404 page with HTTP 200 Response
   custom_error_response {
