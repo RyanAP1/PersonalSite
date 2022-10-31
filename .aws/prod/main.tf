@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "website_policy" {
 }
 
 # ROUTE53 Section
-
+#No Longer Needed? DELETE
 resource "aws_route53_zone" "primary" {
   name = "${var.site_name_prod}"
 
