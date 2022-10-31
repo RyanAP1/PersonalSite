@@ -386,12 +386,10 @@ workflows:
           type: approval
           requires:
             - deploy-site-to-dev
-            filters:
-              branches:
-                only: main
+          filters:
+            branches:
+              only: main
       - deploy-site-to-prod:
           filters:
             branches:
               only: main
-
-      #Next Step. Add Hold and then Deployment to Prod Site
