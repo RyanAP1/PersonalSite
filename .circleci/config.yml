@@ -289,26 +289,26 @@ workflows:
       - plan-apply-dev:
           filters:
             branches:
-              only: InfraDeployDev
+              only: main
       - hold-apply-dev:
           type: approval
           requires:
             - plan-apply-dev
           filters:
             branches:
-              only: InfraDeployDev
+              only: main
       - apply-dev:
           requires:
             - hold-apply-dev
           filters:
             branches:
-              only: InfraDeployDev
+              only: main
       - deploy-site-to-dev:
           requires:
             - apply-dev
           filters:
             branches:
-              only: InfraDeployDev
+              only: main
             
   plan_approve_destroy_dev:
     jobs:
@@ -335,26 +335,26 @@ workflows:
       - plan-apply-prod:
           filters:
             branches:
-              only: InfraDeployProd
+              only: main
       - hold-apply-prod:
           type: approval
           requires:
             - plan-apply-prod
           filters:
             branches:
-              only: InfraDeployProd
+              only: main
       - apply-prod:
           requires:
             - hold-apply-prod
           filters:
             branches:
-              only: InfraDeployProd
+              only: main
       - deploy-site-to-prod:
           requires:
             - apply-prod
           filters:
             branches:
-              only: InfraDeployProd
+              only: main
             
   plan_approve_destroy_prod:
     jobs:
