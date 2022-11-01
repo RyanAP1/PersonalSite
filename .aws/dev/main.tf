@@ -64,3 +64,13 @@ resource "aws_s3_bucket" "www" {
     error_document = "404.html"
   }
 }
+
+#Bucket for www-redirect
+resource "aws_s3_bucket" "website_redirect" {
+  bucket = "www.${var.site_name_dev}"
+  acl = "public-read"
+
+  website {
+    redirect_all_requests_to = "${var.site_name_dev}"
+  }
+}
