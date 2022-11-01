@@ -73,20 +73,4 @@ resource "aws_s3_bucket" "website_redirect" {
   website {
     redirect_all_requests_to = "${aws_s3_bucket.www.website_endpoint}"
   }
-
-  # Policy for veiwing content. Required by aws
-  policy = <<POLICY
-{
-  "Version":"2012-10-17",
-  "Statement":[
-    {
-      "Sid":"AddPerm",
-      "Effect":"Allow",
-      "Principal": "*",
-      "Action":["s3:GetObject"],
-      "Resource":["arn:aws:s3:::www.${var.site_name_dev}/*"]
-    }
-  ]
-}
-  POLICY
 }
