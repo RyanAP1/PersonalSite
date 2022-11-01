@@ -93,16 +93,6 @@ resource "aws_route53_record" "a-record" {
   }
 }
 
-#Cname for www prefix
-resource "aws_route53_record" "www-cname" {
-  zone_id = "${aws_route53_zone.primary.zone_id}"
-  name = "www.${var.site_name_prod}"
-  type = "CNAME"
-  ttl = 60
-  records = ["${var.site_name_prod}"]
-
-}
-
 resource "aws_route53_record" "cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
