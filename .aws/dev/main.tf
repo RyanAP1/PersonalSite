@@ -71,7 +71,7 @@ resource "aws_s3_bucket" "website_redirect" {
   acl = "public-read"
 
   website {
-    redirect_all_requests_to = "${var.site_name_dev}"
+    redirect_all_requests_to = "${aws_s3_bucket.www.website_endpoint}"
   }
 
   # Policy for veiwing content. Required by aws
