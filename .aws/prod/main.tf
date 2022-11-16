@@ -33,7 +33,7 @@ resource "aws_s3_bucket" "www" {
   # Name of bucket, when used for site with dns entry, same as domain name
   bucket = "${var.site_name_prod}"
 
-  # Needs to be available on the internet
+  # private since content will be loaded via Cloudfront
   acl = "private"
 
   #Allows the bucket to be deleted even if it has content

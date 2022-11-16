@@ -2,31 +2,130 @@
 <html>
   <head>
     <title>Ryan Paredes</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Professional Personal Site">
+    <meta name="author" content="Ryan Paredes">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   </head>
-  <body>
-    <h1 style="text-align:center;">Ryan Paredes' Site Intro</h1>
-    <pre>
-      The content of this site isn't the important part. 
-      
-      This html page is simply content to showcase a simple DevOps example for automating the infrastructure and deployment of this content to AWS resources.
+  
+  <body id="about" class= "bg-light" style="font-family: sans-serif;">
+  
+    <nav id=mainNav class="navbar sticky-top navbar-expand-lg navbar-dark font-weight-bold text-uppercase" style="background-color:#05386b;">
+      <a class="navbar-brand text-white" style="padding-left:5%;" href="https://ryanaparedes.com">Ryan Paredes</a>
+      <div class="collapse navbar-collapse navbar-white" id="navbarTogglerDemo03" style="padding-right:5%;">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item mx-0 mx-lg-1 active" data-toggle="collapse" data-target="#navbarTogglerDemo03">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded text-white" href="#about">About</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1 active" data-toggle="collapse" data-target="#navbarTogglerDemo03">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded text-white" href="#links">Links</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1 active" data-toggle="collapse" data-target="#navbarTogglerDemo03">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded text-white" href="#diagrams">Diagrams</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1 active" data-toggle="collapse" data-target="#navbarTogglerDemo03">
+              <a class="nav-link py-3 px-0 px-lg-3 rounded text-white" href="#resume">Resume</a>
+          </li>
+        </ul>
+      </div>
+    </nav>  
 
-      For the codebase, check out <a href="https://github.com/RyanAP1/PersonalSite">my GitHub Page</a>. However, in addition to my resume, I will include diagrams on this page outlining the overall architecture and deployment flow.
-    </pre>
+    <div id="links" class="bg-light">&nbsp;</div>
+    <div class="lead bg-light text-black text-center">
+      <pre>
+        This html page showcases a simple DevOps example for automating the infrastructure and deployment of this content to AWS resources.
 
-    <div style="margin:auto; padding:10px; width:50%;">
-      <iframe src="./resumes/RyanPResumeEmail.pdf" style="width:100%; height:750px;">
-      </iframe>
+        Below are links to my LinkedIn Page, Resume, and the GitHub repo which hosts both this site and supporting Infrastructure-as-code. 
+        
+        Additionally, there are diagrams on this page outlining the overall architecture and deployment flow of the repo.
+      </pre>
     </div>
+    <!--Links section -->    
+    <div id="links" class="bg-light text-light">&nbsp;</div>
+    <div class="bg-light text-light">&nbsp;</div>
+    <header class="masthead bg-light text-black">
+        <div class="d-flex align-items-center flex-column">
+            <div class="position-relative overflow-hidden p-1 p-md-3 m-md-1 text-center">
+                <h2 class="page-section-heading text-dark text-center text-uppercase text-secondary mb-0 font-weight-bold rounded text-uppercase">
+                    Links</h2>
+            </div>
+            <!-- Portfolio card-deck entries first row -->
+            <div class="card-deck" style="margin-bottom: 1%; margin-left: 3%; margin-right: 3%;">
+                <div class="card border-dark">
+                    <img class="card-img-top mx-auto pt-3" src="imgs/LI_Logo.png" alt="Card image cap"
+                        style="width: 75px; height: 100px;">
+                    <div class="card-body text-center">
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="https://www.linkedin.com/in/ryan-paredes/" target="_blank" class="btn btn-primary"
+                          style="background-color:#05386b;">LinkedIn</a>
+                    </div>
+                </div>
 
-    <h2 style="text-align:center;">Hosted Site Pattern</h2>
-    <div style="margin:auto; padding:10px; width:50%;">
-      <img src="./imgs/SitePattern.png" alt="AWS Site Pattern" style="width:100%;height:auto;">
+                <div class="card border-dark">
+                    <img class="card-img-top mx-auto pt-3" src="imgs/GitHub_Logo.png" alt="Card image cap"
+                        style="width: 75px; height: 100px">
+                    <div class="card-body text-center">
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="https://github.com/RyanAP1/PersonalSite" target="_blank" class="btn btn-primary"
+                          style="background-color:#05386b;">GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Diagrams Section -->
+    <div id="diagrams" class="bg-light text-light">&nbsp;</div>
+    <div class="bg-light text-light">&nbsp;</div>
+    <header class="masthead bg-light text-black">
+        <div class="d-flex align-items-center flex-column">
+            <div class="position-relative overflow-hidden p-1 p-md-3 m-md-1 text-center">
+                <h2 class="page-section-heading text-dark text-center text-uppercase text-secondary mb-0 font-weight-bold rounded text-uppercase">
+                    Diagrams</h2>
+            </div>
+            <!-- Diagrams -->
+          <div>
+            <h2 style="text-align:center;">Hosted Site Pattern</h2>
+            <div style="margin:auto; padding:10px; width:50%;">
+              <img src="./imgs/SitePattern.png" alt="AWS Site Pattern" style="width:100%;height:auto;">
+            </div>
+        
+            <h2 style="text-align:center;">CI/CD Overview</h2>
+            <div style="margin:auto; padding:10px; width:75%;">
+              <img src="./imgs/CICDOverview.png" alt="CI/CD overview" style="width:100%;height:auto;">
+            </div>
+          </div>    
+        </div>
+    </header>
+
+    <!-- Resume Section -->
+    <div id="resume" class="bg-light text-light">&nbsp;</div>
+    <div class="bg-light text-light">&nbsp;</div>
+    <header class="masthead bg-light text-black">
+        <div class="d-flex align-items-center flex-column">
+            <div class="position-relative overflow-hidden p-1 p-md-3 m-md-1 text-center">
+                <h2 class="page-section-heading text-dark text-center text-uppercase text-secondary mb-0 font-weight-bold rounded text-uppercase">
+                    Resume</h2>
+            </div>
+            <!-- Resume -->
+            <div style="margin:auto; padding:10px; width:50%;">
+              <iframe src="./resumes/RyanPResumeEmail.pdf" style="width:100%; height:750px;">
+              </iframe>
+            </div>
+        </div>
+    </header>
+
+    <!-- Footer Section-->
+    <div class="copyright py-4 text-center text-white" style="background-color:#05386b">
+      <div class="container"><small>Copyright ©2022 Ryan Paredes</small></div>
     </div>
-
-    <h2 style="text-align:center;">CI/CD Overview</h2>
-    <div style="margin:auto; padding:10px; width:75%;">
-      <img src="./imgs/CICDOverview.png" alt="CI/CD overview" style="width:100%;height:auto;">
-    </div>
-
   </body>
 </html>
