@@ -1,0 +1,89 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'DevOps & SRE Engineer — Portfolio & Resume Site' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Ryan Paredes" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <script is:inline>
+      // Apply dark mode before paint to prevent flash
+      if (
+        localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+  </head>
+  <body class="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-200">
+    <nav class="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/80">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="/" class="text-xl font-bold tracking-tight text-primary-900 dark:text-primary-300">
+          Ryan Paredes
+        </a>
+        <div class="flex items-center gap-6">
+          <a href="#about" class="hidden text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 sm:block">About</a>
+          <a href="#skills" class="hidden text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 sm:block">Skills</a>
+          <a href="#projects" class="hidden text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 sm:block">Projects</a>
+          <a href="#pipeline" class="hidden text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 sm:block">Pipeline</a>
+          <a href="#maintenance" class="hidden text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 sm:block">Security</a>
+          <a href="#resume" class="hidden text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 sm:block">Resume</a>
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle dark mode"
+            class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+          >
+            <!-- Sun icon (shown in dark mode) -->
+            <svg class="hidden h-5 w-5 dark:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+            </svg>
+            <!-- Moon icon (shown in light mode) -->
+            <svg class="block h-5 w-5 dark:hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p>&copy; {new Date().getFullYear()} Ryan Paredes. Built with Astro &amp; Tailwind CSS.</p>
+        <p class="mt-1">
+          <a href="https://github.com/RyanAP1/PortfolioSite" target="_blank" rel="noopener" class="hover:text-primary-600 dark:hover:text-primary-400">
+            View Source on GitHub
+          </a>
+          &middot;
+          <a href="#ai" class="hover:text-primary-600 dark:hover:text-primary-400">
+            Built with AI
+          </a>
+        </p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const html = document.documentElement;
+        html.classList.toggle('dark');
+        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+      });
+    </script>
+  </body>
+</html>

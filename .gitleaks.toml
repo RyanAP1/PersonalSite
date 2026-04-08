@@ -1,0 +1,12 @@
+[title]
+# gitleaks configuration
+# Extend the default gitleaks rules; add allowlist entries for false positives
+
+# Example allowlist — uncomment and customize as needed:
+# [[allowlists]]
+# description = "Allow known-safe test values"
+# paths = ['''docs/examples/.*''']
+#
+# [[allowlists]]
+# description = "Allow specific strings"
+# regexes = ['''EXAMPLE_KEY_DO_NOT_USE''']

@@ -1,0 +1,105 @@
+version: '3'
+
+vars:
+  SITE_DIR: site
+  INFRA_DIR: infra
+
+tasks:
+  # --- Site tasks ---
+  dev:
+    desc: Start Astro dev server
+    dir: '{{.SITE_DIR}}'
+    cmds:
+      - npm run dev
+
+  build:
+    desc: Build Astro site for production
+    dir: '{{.SITE_DIR}}'
+    cmds:
+      - npm run build
+
+  preview:
+    desc: Preview production build locally
+    dir: '{{.SITE_DIR}}'
+    cmds:
+      - npm run preview
+
+  lint:
+    desc: Run all linters
+    cmds:
+      - task: lint:site
+      - task: lint:tf
+
+  lint:site:
+    desc: Run Astro check
+    dir: '{{.SITE_DIR}}'
+    cmds:
+      - npx astro check
+
+  lint:tf:
+    desc: Validate Terraform
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - terraform fmt -check -recursive
+      - terraform validate
+
+  # --- Security tasks ---
+  scan:
+    desc: Run all security scans
+    cmds:
+      - task: scan:secrets
+      - task: scan:trivy
+
+  scan:secrets:
+    desc: Run gitleaks on the repo
+    cmds:
+      - gitleaks detect --source . --verbose
+
+  scan:trivy:
+    desc: Run Trivy IaC + dependency scan
+    cmds:
+      - trivy config {{.INFRA_DIR}}/
+      - trivy fs {{.SITE_DIR}}/
+
+  # --- Infrastructure tasks ---
+  tf:init:
+    desc: "Initialize Terraform (select workspace: task tf:init ENV=dev)"
+    dir: '{{.INFRA_DIR}}'
+    env:
+      TF_WORKSPACE: "PersonalSite-{{.ENV}}"
+    cmds:
+      - terraform init
+    requires:
+      vars: [ENV]
+
+  tf:plan:
+    desc: "Terraform plan (usage: task tf:plan ENV=dev)"
+    dir: '{{.INFRA_DIR}}'
+    env:
+      TF_WORKSPACE: "PersonalSite-{{.ENV}}"
+    cmds:
+      - terraform plan
+    requires:
+      vars: [ENV]
+
+  tf:apply:
+    desc: "Terraform apply (usage: task tf:apply ENV=dev)"
+    dir: '{{.INFRA_DIR}}'
+    env:
+      TF_WORKSPACE: "PersonalSite-{{.ENV}}"
+    cmds:
+      - terraform apply
+    requires:
+      vars: [ENV]
+
+  # --- Setup tasks ---
+  install:
+    desc: Install all dependencies
+    dir: '{{.SITE_DIR}}'
+    cmds:
+      - npm ci
+
+  hooks:
+    desc: Install pre-commit hooks
+    cmds:
+      - pre-commit install

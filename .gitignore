@@ -25,3 +25,23 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Planning docs (local only)
+Planning Docs/
+
+# Old site backup (local only)
+site-old/
+
+# Legacy configs (not used in new setup, contain account IDs)
+.aws/
+.circleci/
+
+# Node / Astro
+node_modules/
+site/dist/
+site/.astro/
+
+# Environment files
+.env
+.env.*
+!.env.example

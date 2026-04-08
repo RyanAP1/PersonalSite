@@ -1,0 +1,122 @@
+name: Deploy
+
+on:
+  # Auto-deploy to dev on merge to main
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/deploy.yml'
+
+  # Manual trigger for prod deployment
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - production
+        default: dev
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Astro site
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site-dist
+          path: site/dist/
+          retention-days: 7
+
+  deploy-dev:
+    name: Deploy to Dev
+    needs: [build]
+    runs-on: ubuntu-latest
+    # Run on push to main, or on manual dispatch targeting dev
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
+    environment: dev
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbad69d21a # v4.3.0
+        with:
+          name: site-dist
+          path: dist/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to S3 (dev)
+        run: |
+          aws s3 sync dist/ s3://${{ vars.DEV_BUCKET_NAME }} \
+            --delete \
+            --cache-control "public, max-age=3600"
+
+      - name: Summary
+        run: echo "### ✅ Deployed to dev" >> $GITHUB_STEP_SUMMARY
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: [build]
+    runs-on: ubuntu-latest
+    # Only run on manual dispatch targeting production
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    environment: production  # Requires approval via GitHub Environment protection rules
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbad69d21a # v4.3.0
+        with:
+          name: site-dist
+          path: dist/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to S3 (prod)
+        run: |
+          aws s3 sync dist/ s3://${{ vars.PROD_BUCKET_NAME }} \
+            --delete \
+            --cache-control "public, max-age=86400"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Summary
+        run: echo "### ✅ Deployed to production" >> $GITHUB_STEP_SUMMARY
