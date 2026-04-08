@@ -1,33 +1,30 @@
-# Personal Resume Site Example
+# Repository Moved
 
-Simple Static Site hosted, to showcase usage of CI/CD automation using AWS Resources.
+This repository has been replaced by the active project repository:
 
-Pattern followed for site hosting Prod is Route53 -> Cloudfront -> S3 Bucket
-![SiteHostingPattern](/site/imgs/SitePattern.png)
-## Endpoints
+https://github.com/RyanAP1/PortfolioSite
 
-Dev: 
-- [RyanAParedes-dev.com.s3-website-us-east-1.amazonaws.com](http://RyanAParedes-dev.com.s3-website-us-east-1.amazonaws.com)
+Use that repository for the current source, infrastructure, CI/CD workflows, and ongoing updates.
 
-Prod:
-- [RyanAParedes.com](https://ryanaparedes.com)
+This repository is retained only so older links from resumes, messages, or bookmarks do not break.
+├── .github/workflows/    # CI, deploy, and IaC workflows
+├── infra/                # Terraform modules (storage, cdn, dns)
+│   ├── modules/
+│   └── environments/     # Per-env tfvars files
+├── site/                 # Astro project
+│   ├── src/pages/
+│   ├── src/layouts/
+│   └── public/
+├── docs/                 # Architecture, AI development, maintenance
+└── Taskfile.yml          # Local dev commands
+```
 
-## Deployment & CI/CD
-This repository is linked to CircleCI and configured to lauch 3 workflows:
-- 1 to deploy site content Dev, then Prod (on Approval)
-- 1 to plan and apply the dev environment infrastructure (On Approval)
-- 1 to plan and apply the prod environment infrastructure.(On Approval)
+## Documentation
 
-See below for more detailed diagrams explaining flow.
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) — Infrastructure diagrams and design decisions
+- [AI_DEVELOPMENT.md](docs/AI_DEVELOPMENT.md) — How AI tools were used to build this project
+- [MAINTENANCE.md](docs/MAINTENANCE.md) — DevSecOps practices for keeping the project secure
 
-### Overview of CI/CD Pattern
-![CI/CD Overview](/site/imgs/CICDOverview.png)
+## License
 
-## Todo / future changes
-- Add more stlying/detail to site beyond hosting pdf resume
-- Add automated checks for site health to fully automate prod deploy
-- Add automated check/scripting to not plan terraform if no change
-- Add prefix "www" support to Prod Cloudfront
-- Add similar cloudfront pattern for dev environment
-- Add more detail to diagrams.
-- CI/CD flow optimizations (consolidating workflows/jobs)
+[MIT](LICENSE)
